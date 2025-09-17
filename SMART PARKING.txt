@@ -1,0 +1,39 @@
+import React, { useState } from "react";
+
+const zones = [
+  { id:"A", name:"Central", free:35, total:120 },
+  { id:"B", name:"West Gate", free:55, total:80 },
+  { id:"C", name:"North Plaza", free:40, total:100 },
+  { id:"D", name:"East Annex", free:10, total:60 }
+];
+
+export default function SmartParking(){
+  const [selected, setSelected] = useState(null);
+
+  return (
+    <div>
+      <h3 className="small">Smart Parking</h3>
+      <div style={{marginTop:10}} className="card">
+        {zones.map(z => (
+          <div key={z.id} style={{display:"flex",justifyContent:"space-between",padding:"10px 0",alignItems:"center"}}>
+            <div>
+              <div style={{fontWeight:600}}>Zone {z.id} - {z.name}</div>
+              <div className="small">Available {z.free}/{z.total}</div>
+            </div>
+            <div style={{display:"flex",gap:8}}>
+              <button className="btnGhost" onClick={()=>setSelected(z.id)}>View</button>
+              <button className="button">Reserve Now</button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {selected && (
+        <div style={{marginTop:12}} className="card">
+          <h4 className="small">Reserve Spot - Zone {selected}</h4>
+          <p className="small">Reservation flow demo. Integrate with backend to complete booking.</p>
+        </div>
+      )}
+    </div>
+  )
+}

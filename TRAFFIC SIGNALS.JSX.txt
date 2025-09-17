@@ -1,0 +1,37 @@
+import React, { useState } from "react";
+
+const initialSignals = [
+  { id: "S-001", name: "Main St & Central Ave", color:"green", duration:30 },
+  { id: "S-002", name: "Elm St & Oak Lane", color:"green", duration:45 },
+  { id: "S-003", name: "Highway 101 Exit", color:"green", duration:25 }
+];
+
+export default function TrafficSignals(){
+  const [signals, setSignals] = useState(initialSignals);
+
+  function change(i, delta){
+    setSignals(prev => prev.map((s,idx) => idx===i ? {...s, duration: Math.max(5,s.duration+delta)} : s));
+  }
+
+  return (
+    <div>
+      <h3 className="small">Traffic Signal Control Panel</h3>
+      <div style={{marginTop:10}} className="card">
+        {signals.map((s, i) => (
+          <div key={s.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 0"}}>
+            <div>
+              <div style={{fontWeight:600}}>{s.name}</div>
+              <div className="small">{s.id} • {s.color}</div>
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:8}}>
+              <button className="btnGhost" onClick={()=>change(i,-5)}>-5s</button>
+              <div style={{padding:"8px 12px",border:"1px solid #e6e9ef",borderRadius:6}}>{s.duration}s</div>
+              <button className="btnGhost" onClick={()=>change(i,5)}>+5s</button>
+              <button className="button" style={{background:"#ef4444"}}>Manual Override</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}

@@ -1,0 +1,18 @@
+import React from "react";
+
+export default function AccidentDetection(){
+  // Placeholder page — in a real product this would show video streams & model outputs
+  return (
+    <div>
+      <h3 className="small">Accident Detection</h3>
+      <div style={{marginTop:10}} className="card">
+        <p className="small">Realtime video analytics and critical alerts from CCTV and dashcams.</p>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,marginTop:10}}>
+          <div style={{background:"#fafafb",padding:12,borderRadius:8}}>Camera: Intersection 1<br/>Status: OK</div>
+          <div style={{background:"#fafafb",padding:12,borderRadius:8}}>Camera: Downtown North<br/>Status: Alert</div>
+          <div style={{background:"#fafafb",padding:12,borderRadius:8}}>Camera: Highway Exit 42<br/>Status: OK</div>
+        </div>
+      </div>
+    </div>
+  )
+}

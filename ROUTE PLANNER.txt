@@ -1,0 +1,86 @@
+import React, { useState } from "react";
+import axios from "axios";
+import { MapContainer, TileLayer, Marker, Popup, Polyline } from "react-leaflet";
+
+/*
+ * IMPORTANT:
+ * Replace ORS_API_KEY with your key from https://openrouteservice.org
+ */
+const ORS_API_KEY = "YOUR_ORS_API_KEY_HERE";
+const GEOCODE_URL = "https://api.openrouteservice.org/geocode/search";
+const DIRECTIONS_URL = "https://api.openrouteservice.org/v2/directions/driving-car";
+
+export default function RoutePlanner(){
+  const [origin, setOrigin] = useState("Connaught Place, Delhi");
+  const [destination, setDestination] = useState("India Gate, Delhi");
+  const [route, setRoute] = useState([]);
+  const [summary, setSummary] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  async function geocode(text){
+    const res = await axios.get(GEOCODE_URL, { params:{ api_key: ORS_API_KEY, text } });
+    if(res.data.features && res.data.features.length>0){
+      const [lng, lat] = res.data.features[0].geometry.coordinates;
+      return [lng, lat];
+    }
+    return null;
+  }
+
+  async function fetchRoute(e){
+    e && e.preventDefault();
+    setLoading(true);
+    try{
+      const a = await geocode(origin);
+      const b = await geocode(destination);
+      if(!a || !b){ alert("Geocoding failed for one of the locations"); setLoading(false); return; }
+
+      const body = { coordinates: [a, b] };
+      const res = await axios.post(DIRECTIONS_URL, body, { headers:{ Authorization: ORS_API_KEY, "Content-Type": "application/json" }});
+      const coords = res.data.features[0].geometry.coordinates.map(([lng,lat]) => [lat, lng]);
+      setRoute(coords);
+      setSummary(res.data.features[0].properties.summary);
+    }catch(err){
+      console.error(err);
+      alert("Route fetch failed. Check console.");
+    }finally{ setLoading(false); }
+  }
+
+  return (
+    <div>
+      <div className="card">
+        <h3>Plan Your Route</h3>
+        <form onSubmit={fetchRoute} style={{marginTop:8}}>
+          <div className="formRow">
+            <label className="small">Origin</label><br/>
+            <input value={origin} onChange={e=>setOrigin(e.target.value)} style={{width:"100%",padding:8,borderRadius:6,border:"1px solid #e6e9ef"}}/>
+          </div>
+          <div className="formRow">
+            <label className="small">Destination</label><br/>
+            <input value={destination} onChange={e=>setDestination(e.target.value)} style={{width:"100%",padding:8,borderRadius:6,border:"1px solid #e6e9ef"}}/>
+          </div>
+
+          <div style={{display:"flex",gap:8}}>
+            <button type="submit" className="button" disabled={loading}>{loading? "Loading...":"Calculate Route"}</button>
+            <button type="button" className="btnGhost" onClick={()=>{setOrigin("");setDestination("");setRoute([]);setSummary(null);}}>Clear</button>
+          </div>
+        </form>
+
+        {summary && (
+          <div style={{marginTop:10}} className="small">
+            Estimated Time: <strong>{Math.round(summary.duration/60)} mins</strong><br/>
+            Distance: <strong>{(summary.distance/1000).toFixed(1)} km</strong>
+          </div>
+        )}
+      </div>
+
+      <div style={{marginTop:12}} className="card mapWrap">
+        <MapContainer center={[28.6139,77.209]} zoom={13} style={{height:"100%", width:"100%"}}>
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          {route.length>0 && <Polyline positions={route} />}
+          {route.length>0 && <Marker position={route[0]}><Popup>Origin</Popup></Marker>}
+          {route.length>0 && <Marker position={route[route.length-1]}><Popup>Destination</Popup></Marker>}
+        </MapContainer>
+      </div>
+    </div>
+  )
+}

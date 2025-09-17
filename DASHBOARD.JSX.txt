@@ -1,0 +1,77 @@
+import React from "react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+
+const incidents = [
+  { id: "INC001", type: "Collision", loc: [28.6139, 77.2090], time: "2024-07-26 14:30", sev: "Medium" },
+  { id: "INC002", type: "Sudden Stop", loc: [28.6200, 77.2100], time: "2024-07-26 11:15", sev: "Low" },
+  { id: "INC003", type: "Rollover", loc: [28.6155, 77.2050], time: "2024-07-26 09:00", sev: "High" }
+];
+
+const trend = [
+  { time: "08:00", value: 40 }, { time: "09:00", value: 60 },
+  { time: "10:00", value: 75 }, { time: "11:00", value: 55 }, { time: "12:00", value: 70 }
+];
+
+export default function Dashboard(){
+  return (
+    <div>
+      <div className="topgrid">
+        <div className="card">
+          <div className="small">Live City Overview Map</div>
+          <h3>Real-time Traffic Conditions</h3>
+          <div className="small">Traffic Density: <strong>75%</strong></div>
+        </div>
+        <div className="card">
+          <div className="small">Route Optimization</div>
+          <h3>12 Active Routes</h3>
+          <div className="small">Feature enabled</div>
+        </div>
+        <div className="card">
+          <div className="small">Smart Parking</div>
+          <h3>230 Spots Available</h3>
+          <div className="small">Live availability across zones</div>
+        </div>
+        <div className="card">
+          <div className="small">Toll Prediction</div>
+          <h3>Dynamic Tolls</h3>
+          <div className="small">Auto-Adjust: <strong>On</strong></div>
+        </div>
+      </div>
+
+      <div className="grid2">
+        <div className="card">
+          <div className="small">Traffic Map & Route Overview</div>
+          <div className="mapWrap" style={{marginTop:10}}>
+            <MapContainer center={[28.6139,77.209]} zoom={13} style={{height:"100%", width:"100%"}}>
+              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap" />
+              {incidents.map(i => (
+                <Marker position={i.loc} key={i.id}>
+                  <Popup>
+                    <strong>{i.type}</strong><br/>{i.time}<br/>Severity: {i.sev}
+                  </Popup>
+                </Marker>
+              ))}
+            </MapContainer>
+          </div>
+        </div>
+
+        <aside className="card">
+          <div className="small">AI Assistant</div>
+          <h4>Predicted Congestion (Next Hour)</h4>
+          <div className="small">Moderate</div>
+          <div style={{marginTop:12}} className="small">Active Incidents: <strong>3</strong></div>
+        </aside>
+      </div>
+
+      <div style={{marginTop:14}} className="card">
+        <h4 className="small">Traffic Trend (Mock)</h4>
+        <div style={{height:180}}>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={trend}><XAxis dataKey="time"/><YAxis/><Tooltip/><Line type="monotone" dataKey="value" stroke="#4f46e5" strokeWidth={2}/></LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </div>
+  )
+}

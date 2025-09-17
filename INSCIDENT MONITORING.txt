@@ -1,0 +1,45 @@
+import React, { useState } from "react";
+
+const initialIncidents = [
+  { id:"INC001", type:"Collision", loc:"Main St & Oak Ave", ts:"2024-07-26 14:30", severity:"Medium" },
+  { id:"INC002", type:"Sudden Stop", loc:"Highway 101 N, Exit 42", ts:"2024-07-26 11:15", severity:"Low" },
+  { id:"INC003", type:"Rollover", loc:"Park Rd. Curve A", ts:"2024-07-26 09:00", severity:"Medium" }
+];
+
+export default function IncidentMonitoring(){
+  const [incidents]=useState(initialIncidents);
+  const [filter, setFilter] = useState({type:"", severity:""});
+
+  const filtered = incidents.filter(i => (!filter.type || i.type===filter.type) && (!filter.severity || i.severity===filter.severity));
+
+  return (
+    <div>
+      <h3 className="small">Incident Monitoring</h3>
+      <div style={{marginTop:10}} className="card">
+        <div style={{display:"flex",gap:8,marginBottom:8}}>
+          <select onChange={e=>setFilter({...filter, type:e.target.value})} style={{padding:8}}>
+            <option value="">All Types</option>
+            <option>Collision</option>
+            <option>Sudden Stop</option>
+            <option>Rollover</option>
+          </select>
+          <select onChange={e=>setFilter({...filter, severity:e.target.value})} style={{padding:8}}>
+            <option value="">All Severity</option>
+            <option>Low</option><option>Medium</option><option>High</option>
+          </select>
+        </div>
+
+        <table className="table">
+          <thead><tr><th>ID</th><th>Type</th><th>Location</th><th>Timestamp</th><th>Severity</th></tr></thead>
+          <tbody>
+            {filtered.map(i => (
+              <tr key={i.id}>
+                <td>{i.id}</td><td>{i.type}</td><td>{i.loc}</td><td>{i.ts}</td><td>{i.severity}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
